@@ -13,8 +13,8 @@ def main():
     data_encoded = pd.get_dummies(data)
 
     # Separate features and target
-    x = data_encoded.drop(columns=["class_e", "class_p"])  # 'class' column is now split into 'class_e' and 'class_p'
-    y = data_encoded["class_p"]  # Class 'p' as target (poisonous or not) (1 or 0)   
+    x = data_encoded.drop(columns=["class_e", "class_p"])   # 'class' column is now split into 'class_e' and 'class_p'
+    y = data_encoded["class_p"]                             # Class 'p' as target (poisonous or not) (1 or 0)   
 
     #Training the model (x, y, 20% of the data)
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=.2) 
