@@ -1,0 +1,6 @@
+Evaluation Date: 2024-10-24_23-22
+Total Time: 453.52834463119507 seconds
+Model: LogisticRegression()
+Max Iterations: 100
+Image Size: (128, 128)
+Accuracy: 8.32%

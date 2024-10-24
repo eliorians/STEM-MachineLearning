@@ -2,7 +2,7 @@ import os
 import pickle
 import numpy as np
 import pandas as pd
-
+import time 
 #encoding imports
 import PIL.Image
 from sklearn.preprocessing import LabelEncoder
@@ -36,24 +36,28 @@ def load_images(folder):
     #create dataframe from the lists and return
     return pd.DataFrame({'image': images, 'label' : labels})
 
-def process_images(image_paths, target_size=(128, 128)):
+def process_images(image_paths, target_size):
+    #TODO experiment with different image processing (different size, not flattening?)
     print("processing images...")
     images_encoded = []
     #open each image
     for img_path in image_paths:
-        #resize to (128, 128)
+        #resize image to given target size
         img = PIL.Image.open(img_path).resize(target_size)
         #normalize pixel values to [0, 1]
         img_array = np.array(img) / 255.0  
-        #flatten to one dimensional array to be able to be used
+        #flatten to one dimensional array to be stored
         images_encoded.append(img_array.flatten())
 
-    return images_encoded                
+    return images_encoded            
+
 
 def main(): 
 
     #init encoder
     le = LabelEncoder()
+
+    image_size = (128, 128)
 
     if os.path.exists('ImageMushroomClassification/encoded_data.pkl'):
         with open('ImageMushroomClassification/encoded_data.pkl', 'rb') as file:
@@ -66,7 +70,7 @@ def main():
         data = load_images('ImageMushroomClassification\data\data')
 
         #encode images (turn image to array of pixels and flatten to one dimensional array)
-        data['images_encoded'] = process_images(data['image'])
+        data['images_encoded'] = process_images(data['image'], image_size)
 
         #encode labels
         data['label_encoded'] = le.fit_transform(data['label'])
@@ -78,28 +82,63 @@ def main():
         print('encoded data saved.')
 
     #reduce dataset for experimenting
-    data = data.sample(frac=0.005)
+    #data = data.sample(frac=0.005)
 
     print("the processed data:")
     print(data)
+
+    #start timing
+    start = time.time()
 
     #set up "x" and "y" columns
     #convert encoded images to 2d numpy array for training
     x = np.stack(data['images_encoded'].values)
     y = data['label_encoded']
 
-    #TODO split data into training and testing
+    #split data into training and testing
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=.2) 
 
-    #TODO choose a model (start with logistic regression)
+    #choose a model (start with logistic regression)
+    max_iterations = 100
+    model = LogisticRegression(max_iter = max_iterations)
 
-    #TODO fit the model
+    #fit the model
+    model.fit(x_train, y_train)
 
-    #TODO generate predictions
+    #generate predictions
+    y_predictions = model.predict(x_test)
 
-    #TODO evaluate predictions
+    #evaluate predictions
+    accuracy = accuracy_score(y_test, y_predictions)
+    accuracyPercent = str(accuracy * 100)
+    print(f"accuracy for {model}: {accuracyPercent}%")
 
-    #TODO plot confusion matrix
+    #end timing here
+    end = time.time()
+    total_time = (end - start)
+    print("Time spent: (seconds)" + str(total_time))
+    
+    #plot confusion matrix
+    conf_matrix = confusion_matrix(y_test, y_predictions)
+    plt.figure(figsize=(24, 24))
+    sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=data['label'], yticklabels=data['label'])
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.title("Confusion Matrix")
+    plt.show()
 
+    #save plot with unique name
+    currDate = time.strftime("%Y-%m-%d_%H-%M", time.gmtime())
+    plt.savefig(f'ImageMushroomClassification\plots\plot_{currDate}')
+
+    #logging
+    with open(f'ImageMushroomClassification/eval.txt', 'a') as f:
+        f.write(f"Evaluation Date: {currDate}\n")
+        f.write(f"Total Time (seconds): {total_time} seconds\n")
+        f.write(f"Model: {model}\n")
+        f.write(f"Max Iterations: {max_iterations}\n")
+        f.write(f"Image Size: {image_size}\n")
+        f.write(f"Accuracy: {accuracyPercent}%\n")
 
 #running main
 if __name__ == "__main__":
