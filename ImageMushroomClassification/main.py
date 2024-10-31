@@ -119,13 +119,14 @@ def main():
     print("Time spent: (seconds)" + str(total_time))
     
     #plot confusion matrix
-    conf_matrix = confusion_matrix(y_test, y_predictions)
-    plt.figure(figsize=(24, 24))
-    sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=data['label'], yticklabels=data['label'])
-    plt.xlabel("Predicted")
-    plt.ylabel("Actual")
-    plt.title("Confusion Matrix")
-    plt.show()
+    #TODO make the plot better...
+    # conf_matrix = confusion_matrix(y_test, y_predictions)
+    # plt.figure(figsize=(24, 24))
+    # sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=data['label'], yticklabels=data['label'])
+    # plt.xlabel("Predicted")
+    # plt.ylabel("Actual")
+    # plt.title("Confusion Matrix")
+    # plt.show()
 
     #save plot with unique name
     currDate = time.strftime("%Y-%m-%d_%H-%M", time.gmtime())
