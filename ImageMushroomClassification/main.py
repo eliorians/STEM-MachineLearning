@@ -10,11 +10,15 @@ from ast import literal_eval
 #model training imports
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
 #evaluation imports
 from sklearn.metrics import accuracy_score, confusion_matrix
 #plotting imports
 import seaborn as sns
 from matplotlib import pyplot as plt
+import plotly.express as px
 
 def load_images(folder):
     print("loading images...")
@@ -63,11 +67,14 @@ def main():
         with open('ImageMushroomClassification/encoded_data.pkl', 'rb') as file:
             data = pickle.load(file)
 
-        print('encoded data loaded.')
+        with open('ImageMushroomClassification/label_encoder.pkl', 'rb') as le_file:
+            le = pickle.load(le_file)
+
+        print('Encoded data and LabelEncoder loaded.')
 
     else:
         # build the dataframe of images and labels
-        data = load_images('ImageMushroomClassification\data\data')
+        data = load_images('ImageMushroomClassification/data/data')
 
         #encode images (turn image to array of pixels and flatten to one dimensional array)
         data['images_encoded'] = process_images(data['image'], image_size)
@@ -78,8 +85,12 @@ def main():
         #save dataframe to format suitable for encoded images
         with open('ImageMushroomClassification/encoded_data.pkl', 'wb') as file:
             pickle.dump(data, file)
+        
+        #save label encoder
+        with open('ImageMushroomClassification/label_encoder.pkl', 'wb') as le_file:
+            pickle.dump(le, le_file)
 
-        print('encoded data saved.')
+        print('Encoded data and LabelEncoder saved.')
 
     #reduce dataset for experimenting
     #data = data.sample(frac=0.005)
@@ -98,10 +109,12 @@ def main():
     #split data into training and testing
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=.2) 
 
-    #choose a model (start with logistic regression)
-    max_iterations = 100
-    model = LogisticRegression(max_iter = max_iterations)
-
+    #choose a model (start with logistic regression)    
+    model = LogisticRegression(max_iter= 250)
+    #model = SVC(kernel='linear', max_iter= 250)
+    #model = RandomForestClassifier(n_estimators=250, max_depth=10)
+    #model = KNeighborsClassifier(n_neighbors=5) 
+    
     #fit the model
     model.fit(x_train, y_train)
 
@@ -116,30 +129,52 @@ def main():
     #end timing here
     end = time.time()
     total_time = (end - start)
-    print("Time spent: (seconds)" + str(total_time))
+    print("Time spent: (seconds): " + str(total_time))
     
-    #plot confusion matrix
-    #TODO make the plot better...
-    # conf_matrix = confusion_matrix(y_test, y_predictions)
-    # plt.figure(figsize=(24, 24))
-    # sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=data['label'], yticklabels=data['label'])
-    # plt.xlabel("Predicted")
-    # plt.ylabel("Actual")
-    # plt.title("Confusion Matrix")
-    # plt.show()
+    # --- LOGGING --- #
 
-    #save plot with unique name
     currDate = time.strftime("%Y-%m-%d_%H-%M", time.gmtime())
-    plt.savefig(f'ImageMushroomClassification\plots\plot_{currDate}')
-
-    #logging
     with open(f'ImageMushroomClassification/eval.txt', 'a') as f:
         f.write(f"Evaluation Date: {currDate}\n")
         f.write(f"Total Time (seconds): {total_time} seconds\n")
         f.write(f"Model: {model}\n")
-        f.write(f"Max Iterations: {max_iterations}\n")
         f.write(f"Image Size: {image_size}\n")
         f.write(f"Accuracy: {accuracyPercent}%\n")
+        f.write("\n")
+
+    # --- PLOTTING --- #
+        
+    #remap labels labels
+    unique_labels = np.unique(np.concatenate([y_test, y_predictions]))
+    class_labels = le.inverse_transform(unique_labels)
+   
+    #create a df of confusion matrix
+    conf_matrix = confusion_matrix(y_test, y_predictions)
+    np.fill_diagonal(conf_matrix, 0)
+    conf_df = pd.DataFrame(conf_matrix)
+
+    #create the heatmap
+    fig = px.imshow(
+        conf_df,
+        labels=dict(x="Predicted Label", y="True Label", color="Count"),
+        x=class_labels,
+        y=class_labels,
+        color_continuous_scale="Blues",
+        aspect="auto"
+    )
+
+    #update layout
+    fig.update_layout(
+        title="Confusion Matrix",
+        xaxis_title="Predicted Label",
+        yaxis_title="True Label"
+    )
+
+    #save plot with unique name
+    fig.write_html(f'ImageMushroomClassification\plots\{model}_{currDate}.html')
+
+    #display the plot
+    fig.show()
 
 #running main
 if __name__ == "__main__":

@@ -4,3 +4,54 @@ Model: LogisticRegression()
 Max Iterations: 100
 Image Size: (128, 128)
 Accuracy: 8.32%
+
+Evaluation Date: 2024-11-07_19-20
+Total Time (seconds): 1458.848423242569 seconds
+Model: SVC(kernel='linear', max_iter=100)
+Max Iterations: 100
+Image Size: (128, 128)
+Accuracy: 8.0%
+
+Evaluation Date: 2024-11-07_19-50
+Total Time (seconds): 5.867337942123413 seconds
+Model: KNeighborsClassifier(n_neighbors=20)
+Max Iterations: 250
+Image Size: (128, 128)
+Accuracy: 4.16%
+
+Evaluation Date: 2024-11-07_20-07
+Total Time (seconds): 5.428203105926514 seconds
+Model: KNeighborsClassifier(n_neighbors=25)
+Image Size: (128, 128)
+Accuracy: 4.0%
+
+Evaluation Date: 2024-11-07_20-09
+Total Time (seconds): 4.472963809967041 seconds
+Model: KNeighborsClassifier(n_neighbors=50)
+Image Size: (128, 128)
+Accuracy: 1.76%
+
+Evaluation Date: 2024-11-07_20-09
+Total Time (seconds): 3.771656036376953 seconds
+Model: KNeighborsClassifier(n_neighbors=10)
+Image Size: (128, 128)
+Accuracy: 3.36%
+
+Evaluation Date: 2024-11-07_20-09
+Total Time (seconds): 4.279345512390137 seconds
+Model: KNeighborsClassifier()
+Image Size: (128, 128)
+Accuracy: 3.04%
+
+Evaluation Date: 2024-11-07_20-13
+Total Time (seconds): 142.56727695465088 seconds
+Model: RandomForestClassifier(max_depth=10, n_estimators=250)
+Image Size: (128, 128)
+Accuracy: 1.76%
+
+Evaluation Date: 2024-11-07_20-45
+Total Time (seconds): 1462.6541044712067 seconds
+Model: SVC(kernel='linear', max_iter=250)
+Image Size: (128, 128)
+Accuracy: 7.68%
+
