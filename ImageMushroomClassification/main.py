@@ -7,7 +7,6 @@ import pickle
 import PIL.Image
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from ast import literal_eval
 #model training imports
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -53,14 +52,12 @@ def process_images(image_paths, target_size):
         #flatten to one dimensional array to be stored
         images_encoded.append(img_array.flatten())
 
-    return images_encoded            
-
+    return images_encoded        
 
 def main(): 
 
     #init encoder
     le = LabelEncoder()
-
     image_size = (128, 128)
 
     if os.path.exists('ImageMushroomClassification/encoded_data.pkl'):
