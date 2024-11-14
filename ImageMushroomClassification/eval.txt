@@ -55,3 +55,9 @@ Model: SVC(kernel='linear', max_iter=250)
 Image Size: (128, 128)
 Accuracy: 7.68%
 
+Evaluation Date: 2024-11-14_21-04
+Total Time (seconds): 375.1066975593567 seconds
+Model: LogisticRegression(max_iter=250)
+Image Size: (128, 128)
+Accuracy: 7.199999999999999%
+

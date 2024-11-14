@@ -1,14 +1,14 @@
 import os
-import pickle
 import numpy as np
 import pandas as pd
 import time 
-#encoding imports
+#preprocessing imports
+import pickle
 import PIL.Image
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
 from ast import literal_eval
 #model training imports
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
