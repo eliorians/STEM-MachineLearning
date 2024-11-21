@@ -15,28 +15,40 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 
 def main():
-    #Using Carson's mac relative path
-    #TODO add our own test urls
-    data = pd.read_csv("SpamEmailClassification/url_spam_classification.csv")
-    print(data)
 
-    #TODO better notes on how this works
+    data = pd.read_csv("SpamEmailClassification/url_spam_classification.csv")
+
+    our_data = pd.read_csv("SpamEmailClassification/our_url.csv")           # Our links
+    #our_data = pd.read_csv("SpamEmailClassification/synthetic_data.csv")   # Synthetic data
+    #our_data = pd.read_csv("SpamEmailClassification/single_url.csv")       # Single link testing
+
+    useGeneratedURLS = True
+    if (useGeneratedURLS):
+        # Mark the training and testing data
+        data['is_train'] = True
+        our_data['is_train'] = False
+        data = pd.concat([data, our_data], ignore_index=True)
+
     # Convert URLs to numerical features using TF-IDF
     vectorizer = TfidfVectorizer(max_features=5000)
-    x = vectorizer.fit_transform(data['url'])   #use as x_train
-    #print(x)
+    x = vectorizer.fit_transform(data['url'])
 
     # Encode labels (spam or not spam)
     encoder = LabelEncoder()
-    y = encoder.fit_transform(data['is_spam'])  #use as y_train
-    #print(y)
+    y = encoder.fit_transform(data['is_spam'])
 
-    #TODO use our own urls as test set    
     #split data into training and testing
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=.2) 
+    if (useGeneratedURLS):
+        x_train = x[data['is_train']]
+        y_train = y[data['is_train']]
+
+        x_test = x[~data['is_train']]
+        y_test = y[~data['is_train']]
+
+    else:
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=.2) 
 
     #choose a model (start with logistic regression)
-    #TODO mess with more models
     model = LogisticRegression(max_iter= 500, n_jobs= -1 )
 
     #fit the model
@@ -50,10 +62,16 @@ def main():
     accuracyPercent = str(accuracy * 100)
     print(f"accuracy for {model}: {accuracyPercent}%")
 
-    #TODO 
-    #Plot things
-    #Add out own csv of url's and train on their data, test on ours (can test one at a time)
-    #Look at the same problem with other models (Pytorch, tensor flow) if time allows
+    # Plot confusion matrix
+    conf_matrix = confusion_matrix(y_test, y_predictions)
+    
+    # Plot the confusion matrix
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=['Not Spam', 'Spam'], yticklabels=['Not Spam', 'Spam'])
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.title("Confusion Matrix")
+    plt.show()
     
 
 #Running main
